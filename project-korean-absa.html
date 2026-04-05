@@ -136,6 +136,32 @@
     .metric-name { font-size: 0.875rem; color: var(--text-secondary); }
     .metric-value { font-weight: 700; color: var(--accent); }
     .model-desc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-top: 1rem; }
+
+    /* Results Table */
+    .results-table-wrapper { overflow-x: auto; margin: 2rem 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    thead tr { background: rgba(255, 107, 107, 0.1); }
+    th {
+      padding: 0.85rem 1.25rem;
+      text-align: left;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    td.highlight { color: var(--text-primary); font-weight: 700; }
+
     .aspects-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 2rem 0; }
     .aspect-pill {
       background: rgba(255, 255, 255, 0.05);
@@ -239,13 +265,13 @@
     <div class="project-label animate-in">Project 002</div>
     <h1 class="animate-in">Korean ABSA Benchmark</h1>
     <p class="hero-subtitle animate-in">
-      End-to-end benchmark of three approaches for aspect-based sentiment analysis on Korean restaurant
-      reviews covering FOOD, PRICE, SERVICE, and AMBIENCE.
+      End-to-end benchmark of three approaches — Classical ML, Transformer, and LLM — for
+      aspect-based sentiment analysis on Korean restaurant reviews covering FOOD, PRICE, SERVICE, and AMBIENCE.
     </p>
     <div class="hero-stats animate-in">
       <div class="stat">
         <span class="stat-value">0.94</span>
-        <span class="stat-label">Mention F1</span>
+        <span class="stat-label">Best Mention F1</span>
       </div>
       <div class="stat">
         <span class="stat-value">3</span>
@@ -256,107 +282,258 @@
         <span class="stat-label">Aspects Detected</span>
       </div>
       <div class="stat">
-        <span class="stat-value">128M</span>
+        <span class="stat-value">127M</span>
         <span class="stat-label">Best Model Params</span>
       </div>
     </div>
   </header>
 
+  <!-- Model Cards -->
   <section class="section">
     <h2 class="section-title">Model Benchmark Results</h2>
     <div class="models-grid">
+
       <article class="model-card">
-        <h3>KcELECTRA</h3>
-        <p class="model-meta">Encoder-based Korean transformer baseline</p>
+        <h3>TF-IDF + LR</h3>
+        <p class="model-meta">Classical ML lightweight baseline (~192K params)</p>
         <div class="model-metrics">
           <div class="metric-row"><span class="metric-name">Mention F1</span><span class="metric-value">0.91</span></div>
-          <div class="metric-row"><span class="metric-name">Sentiment F1</span><span class="metric-value">0.84</span></div>
-          <div class="metric-row"><span class="metric-name">Strength</span><span class="metric-value">Efficient</span></div>
+          <div class="metric-row"><span class="metric-name">Sentiment F1</span><span class="metric-value">0.51</span></div>
+          <div class="metric-row"><span class="metric-name">Inference Time</span><span class="metric-value">0.05s</span></div>
+          <div class="metric-row"><span class="metric-name">Disk Size</span><span class="metric-value">2.36 MB</span></div>
+          <div class="metric-row"><span class="metric-name">Strength</span><span class="metric-value">Fastest</span></div>
         </div>
         <p class="model-desc">
-          A strong Korean-language baseline that performs well with supervised fine-tuning and relatively
-          efficient inference.
+          A two-stage pipeline using character n-gram TF-IDF vectorization and multi-output Logistic
+          Regression. Over 20× faster than KcELECTRA and uses less than 0.5% of its disk space,
+          making it ideal for low-resource or real-time deployments.
         </p>
       </article>
+
       <article class="model-card featured">
         <span class="model-badge">Best</span>
-        <h3>Qwen 2.5</h3>
-        <p class="model-meta">Instruction-tuned LLM for structured ABSA output</p>
+        <h3>KcELECTRA</h3>
+        <p class="model-meta">Korean transformer fine-tuned for ABSA (~127M params)</p>
         <div class="model-metrics">
           <div class="metric-row"><span class="metric-name">Mention F1</span><span class="metric-value">0.94</span></div>
-          <div class="metric-row"><span class="metric-name">Sentiment F1</span><span class="metric-value">0.88</span></div>
-          <div class="metric-row"><span class="metric-name">Strength</span><span class="metric-value">Flexible</span></div>
+          <div class="metric-row"><span class="metric-name">Sentiment F1</span><span class="metric-value">0.57</span></div>
+          <div class="metric-row"><span class="metric-name">Inference Time</span><span class="metric-value">1.04s</span></div>
+          <div class="metric-row"><span class="metric-name">Disk Size</span><span class="metric-value">485 MB</span></div>
+          <div class="metric-row"><span class="metric-name">Strength</span><span class="metric-value">Most Accurate</span></div>
         </div>
         <p class="model-desc">
-          The strongest overall performer in the benchmark, especially when prompts are shaped to produce
-          clean aspect and sentiment outputs in a consistent schema.
+          The strongest overall performer. Fine-tuned with a joint mention + sentiment head sharing a
+          single [CLS] embedding. Leads across all four aspects and offers the best
+          performance-to-cost ratio for production use.
         </p>
       </article>
+
       <article class="model-card">
-        <h3>Prompt Pipeline</h3>
-        <p class="model-meta">Prompt-engineered extraction workflow</p>
+        <h3>Qwen 2.5 LLM</h3>
+        <p class="model-meta">7B-parameter LLM via Ollama — few-shot prompting</p>
         <div class="model-metrics">
-          <div class="metric-row"><span class="metric-name">Mention F1</span><span class="metric-value">0.87</span></div>
-          <div class="metric-row"><span class="metric-name">Sentiment F1</span><span class="metric-value">0.81</span></div>
-          <div class="metric-row"><span class="metric-name">Strength</span><span class="metric-value">Fast iteration</span></div>
+          <div class="metric-row"><span class="metric-name">Mention F1</span><span class="metric-value">0.81</span></div>
+          <div class="metric-row"><span class="metric-name">Sentiment F1</span><span class="metric-value">0.44</span></div>
+          <div class="metric-row"><span class="metric-name">Inference Time</span><span class="metric-value">1801s</span></div>
+          <div class="metric-row"><span class="metric-name">Disk Size</span><span class="metric-value">4700 MB</span></div>
+          <div class="metric-row"><span class="metric-name">Strength</span><span class="metric-value">Hard Cases</span></div>
         </div>
         <p class="model-desc">
-          Useful for quick experimentation and schema exploration, though more sensitive to prompt phrasing
-          and formatting drift.
+          Underperforms on standard metrics in its few-shot setting, but shows clear advantages on
+          complex multi-aspect and sarcastic reviews. Fine-tuning could close the gap significantly.
+          Requires no training — zero training time.
         </p>
       </article>
+
     </div>
     <div class="detail-block">
       <h4>Benchmark Scope</h4>
       <p>
-        The benchmark evaluates both aspect mention detection and sentiment classification, letting the
-        comparison capture extraction quality as well as sentiment understanding.
+        Each model is evaluated on per-aspect F1 scores, mention F1, sentiment F1, inference time,
+        model size, and parameter count. The dataset was split 70% train / 15% validation / 15% test
+        using MultilabelStratifiedShuffleSplit to preserve aspect label distribution.
       </p>
     </div>
   </section>
 
+  <!-- Per-Aspect Results Table -->
   <section class="section section-dark">
     <div style="max-width: 1200px; margin: 0 auto; padding: 0 3rem 6rem;">
-      <h2 class="section-title">Aspect Coverage</h2>
-      <div class="aspects-grid">
-        <div class="aspect-pill">FOOD</div>
-        <div class="aspect-pill">PRICE</div>
-        <div class="aspect-pill">SERVICE</div>
-        <div class="aspect-pill">AMBIENCE</div>
+      <h2 class="section-title">Per-Aspect F1 Scores</h2>
+      <div class="results-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>TF-IDF + LR</th>
+              <th>KcELECTRA</th>
+              <th>Qwen 2.5</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="highlight">FOOD</td>
+              <td>0.787</td>
+              <td class="highlight">0.876</td>
+              <td>0.540</td>
+            </tr>
+            <tr>
+              <td class="highlight">PRICE</td>
+              <td>0.788</td>
+              <td class="highlight">0.818</td>
+              <td>0.690</td>
+            </tr>
+            <tr>
+              <td class="highlight">SERVICE</td>
+              <td>0.783</td>
+              <td class="highlight">0.891</td>
+              <td>0.770</td>
+            </tr>
+            <tr>
+              <td class="highlight">AMBIENCE</td>
+              <td>0.719</td>
+              <td class="highlight">0.780</td>
+              <td>0.522</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div class="detail-block">
-        <h4>Why This Matters</h4>
+        <h4>Key Insight</h4>
         <p>
-          Korean restaurant reviews often express multiple opinions in a single sentence, so the task needs
-          models that can separate aspect mentions cleanly before assigning the right sentiment label.
+          KcELECTRA leads across all four aspects. Qwen 2.5 struggles most with FOOD and AMBIENCE,
+          suggesting that few-shot prompting without fine-tuning is insufficient for fine-grained
+          aspect detection in Korean.
+        </p>
+      </div>
+
+      <h2 class="section-title" style="margin-top: 3rem;">Efficiency & Model Complexity</h2>
+      <div class="results-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Parameters</th>
+              <th>Size on Disk</th>
+              <th>Training Time</th>
+              <th>Inference Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="highlight">TF-IDF + LR</td>
+              <td>192K</td>
+              <td>2.36 MB</td>
+              <td>1.01s</td>
+              <td class="highlight">0.05s</td>
+            </tr>
+            <tr>
+              <td class="highlight">KcELECTRA</td>
+              <td>127M</td>
+              <td>485.28 MB</td>
+              <td>146s</td>
+              <td>1.04s</td>
+            </tr>
+            <tr>
+              <td class="highlight">Qwen 2.5 LLM</td>
+              <td>7B</td>
+              <td>4700 MB</td>
+              <td>0s (no training)</td>
+              <td>1801s</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="section-title" style="margin-top: 3rem;">Hard Multi-Aspect Cases (29 Reviews)</h2>
+      <div class="results-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>TF-IDF + LR Errors</th>
+              <th>KcELECTRA Errors</th>
+              <th>Qwen 2.5 Errors</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="highlight">FOOD</td><td>12</td><td>6</td><td>8</td></tr>
+            <tr><td class="highlight">PRICE</td><td>5</td><td>3</td><td>2</td></tr>
+            <tr><td class="highlight">SERVICE</td><td>4</td><td>4</td><td class="highlight">3</td></tr>
+            <tr><td class="highlight">AMBIENCE</td><td>13</td><td>7</td><td class="highlight">4</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="detail-block">
+        <h4>Hard Cases Takeaway</h4>
+        <p>
+          Qwen 2.5 performs best on hard multi-aspect and sarcastic reviews, suggesting its generative
+          reasoning is valuable for complex implicit sentiment — even when overall metrics trail KcELECTRA.
         </p>
       </div>
     </div>
   </section>
 
+  <!-- Aspect Coverage -->
   <section class="section">
-    <h2 class="section-title">Technical Stack</h2>
-    <div class="tech-stack">
-      <span class="tech-tag">Transformers</span>
-      <span class="tech-tag">KcELECTRA</span>
-      <span class="tech-tag">Qwen 2.5</span>
-      <span class="tech-tag">Python</span>
-      <span class="tech-tag">Prompt Engineering</span>
-      <span class="tech-tag">Benchmarking</span>
-      <span class="tech-tag">Korean NLP</span>
+    <h2 class="section-title">Aspect Coverage</h2>
+    <div class="aspects-grid">
+      <div class="aspect-pill">FOOD</div>
+      <div class="aspect-pill">PRICE</div>
+      <div class="aspect-pill">SERVICE</div>
+      <div class="aspect-pill">AMBIENCE</div>
     </div>
     <div class="detail-block">
-      <h4>Key Takeaway</h4>
+      <h4>Why This Matters</h4>
       <p>
-        The best results came from combining strong Korean-language modeling with output constraints that
-        make evaluation cleaner and reduce ambiguity in multi-aspect reviews.
+        Korean restaurant reviews often express multiple opinions in a single sentence, requiring
+        models to cleanly separate aspect mentions before assigning the correct sentiment label.
+        A sentence like "The food was delicious, but the service was terrible" must yield
+        FOOD → Positive and SERVICE → Negative — not a single blended label.
       </p>
+    </div>
+  </section>
+
+  <!-- Technical Stack -->
+  <section class="section section-dark">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 3rem 6rem;">
+      <h2 class="section-title">Technical Stack</h2>
+      <div class="tech-stack">
+        <span class="tech-tag">Transformers</span>
+        <span class="tech-tag">KcELECTRA</span>
+        <span class="tech-tag">Qwen 2.5</span>
+        <span class="tech-tag">TF-IDF + Logistic Regression</span>
+        <span class="tech-tag">Python</span>
+        <span class="tech-tag">scikit-learn</span>
+        <span class="tech-tag">Ollama</span>
+        <span class="tech-tag">Streamlit</span>
+        <span class="tech-tag">Prompt Engineering</span>
+        <span class="tech-tag">Korean NLP</span>
+        <span class="tech-tag">M-ABSA Dataset</span>
+        <span class="tech-tag">AdamW Optimizer</span>
+      </div>
+      <div class="detail-block">
+        <h4>Dataset</h4>
+        <p>
+          No purpose-built Korean restaurant ABSA dataset existed, so the multilingual M-ABSA corpus
+          was filtered, restructured, and relabeled for the four target aspects. Sentiment labels are
+          encoded as 0 = Not Mentioned, 1 = Negative, 2 = Positive.
+        </p>
+      </div>
+      <div class="detail-block">
+        <h4>Key Takeaway</h4>
+        <p>
+          KcELECTRA offers the best overall performance and production viability. TF-IDF + LR is a
+          strong lightweight fallback. Fine-tuning Qwen 2.5 on the ABSA task remains the most
+          promising avenue for future improvement.
+        </p>
+      </div>
     </div>
   </section>
 
   <section class="cta-section">
     <a href="https://github.com/ranasantosh" target="_blank" rel="noopener" class="cta-button">
-      View Code on GitHub ->
+      View Code on GitHub →
     </a>
   </section>
 
